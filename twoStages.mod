@@ -12,16 +12,16 @@ param dk{k in K}; #demand of customer K
 
 param tij{i in I, j in J}; #unit cost of transportation from plant i to distribution center j
 param cjk{j in J, k in K}; #unit cost of transportation from distribution J to customer K
-param gj{j in J}; #Fixed cost of operatin distribution center J
+param gj{j in J}; #Fixed cost of operating distribution center J
 
 param W; #an upper limit on total number of DC that can be opened
 
 
 ###########################################
 
-var xij{i in I, j in J}; #Amount of shipment from plant i to distribution centre j.
-var yjk{j in J, k in K}; #Amount of shipment from distribution centre j to customer k.
-var zj{j in J}; #Binary 1 if DC j is opened. Other case 0.
+var xij{i in I, j in J}, integer; #Amount of shipment from plant i to distribution centre j.
+var yjk{j in J, k in K}, integer; #Amount of shipment from distribution centre j to customer k.
+var zj{j in J}, binary; #Binary 1 if DC j is opened. Other case 0.
 
 ###########################################
 ###########################################
@@ -44,10 +44,49 @@ solve;
 ###########################################
 ###########################################
 
+printf "\n\n";
 for {j in J}
 {
-  printf "DC used: %3s %5s", j, zj[j];
+  printf "\n\nDC usadas: %3s %5s \n", j, zj[j];
+
+	printf "\nCantidad Usada de  DC \t %s", j;
+	printf "\t : %s", sum{k in K}yjk[j,k];
+
 }
+
+printf "\n\n";
+for {i in I}
+{
+	printf "\nCantidad Suministrada por Planta  \t %s", i;
+	printf "\t : %s", sum{j in J}xij[i,j];
+
+}
+
+printf "\n\n";
+printf "\nCosto de Transporte Plata - CD";
+for {i in I}
+{
+	printf "\nPlanta %s", i;
+	for{j in J}
+	{
+		printf "\n\tCD %s", j;
+		printf "\n\t\tCantidad %s \tCosto Unidad %s \tCosto Total %s", xij[i,j], tij[i,j], xij[i,j]*tij[i,j];
+	}
+}
+
+printf "\n\n";
+printf "\nCosto de CD - Cliente";
+for {j in J}
+{
+	printf "\nCD %s", j;
+	for{k in K}
+	{
+		printf "\n\tCliente %s", k;
+		printf "\n\t\tCantidad %s \tCosto Unidad %s \tCosto Total %s", yjk[j,k], cjk[j,k], yjk[j,k]*cjk[j,k];
+	}
+}
+
+printf "\n\n\n";
 
 ###########################################
 ###########################################
