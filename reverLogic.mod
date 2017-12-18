@@ -61,8 +61,8 @@ var wkm{k in K, m in M}, binary; #1 if processing center k is open; 0, otherwise
 
 minimize Z: sum{j in J, p in P}codjp[j,p]*zjp[j,p] + sum{k in K, m in M}copkm[k,m]*wkm[k,m] +
             sum{i in I, j in J, p in P}cijp[i,j,p]*xijp[i,j,p] + sum{i in I, k in K, p in P}cikp[i,k,p]*xikp[i,k,p] +
-            sum{j in J, k in K, m in M}cjkm[j,k,m]*xjkm[j,k,m] + sum{j in J, m in M}cjRm[j,m]*xjRm[j,m] +
-						sum{k in K, m in M}ckFm[k,m]*xkFm[k,m] + sum{k in K, m in M}ckRm[k,m]*xkRm[k,m] +
+            sum{j in J, k in K, m in M}cjkm[j,k,m]*xjkm[j,k,m] - sum{j in J, m in M}cjRm[j,m]*xjRm[j,m] +
+						sum{k in K, m in M}ckFm[k,m]*xkFm[k,m] - sum{k in K, m in M}ckRm[k,m]*xkRm[k,m] +
 						sum{k in K, m in M}ckDm[k,m]*xkDm[k,m] + sum{m in M}cSFm[m]*ySFm[m];
 
 
@@ -98,17 +98,96 @@ for{i in I}
 		{
 			printf "\n\t\tCentr. de Desamblaje %s \t Cantidad %s \t Costo Unidad %s", j, xijp[i,j,p];
 			printf "\n\t\t\t Costo Total %s", xijp[i,j,p]*cijp[i,j,p];
-			printf "-*-*-\n";
+			printf "\n\t\t\t-*-*-\n";
 		}
 
+		printf "\n\t\t#*#*#\n";
 		for {k in K}
 		{
 			printf "\n\t\tCentr. de Procesamiento %s \t Cantidad %s \t Costo Unidad %s", k, xikp[i,k,p];
 			printf "\n\t\t\t Costo Total %s", xikp[i,k,p]*cikp[i,k,p];
+			printf "\n\t\t\t-*-*-\n";
 		}
 	}
 }
 
+for{j in J}
+{
+	printf "\nCentro de Desamblaje\t %s", j;
+	for{k in K}
+	{
+		printf "\n\tCentro de Procesamiento\t %s", k;
+		for {m in M}
+		{
+			printf "\n\t\tParte %s \t Cantidad %s \t Costo Unidad %s", m, xjkm[j,k,m];
+			printf "\n\t\t\t Costo Total %s", xjkm[j,k,m]*xjkm[j,k,m];
+			printf "\n\t\t\t-*-*-\n";
+		}
+	}
+}
+
+
+for{j in J}
+{
+	printf "\nCentro de Desamblaje\t %s", j;
+	for{m in M}
+	{
+		printf "\n\tParte\t %s", m;
+		printf "\n\t\tCantidad Enviada al Basurero\t %s", xjDm[j,m];
+		printf "\n\t\tCantidad Enviada a Reciclaje\t %s", xjRm[j,m];
+	}
+	printf "\n\n";
+}
+
+for{j in J}
+{
+	printf "\nCentro de Desamblaje\t %s", j;
+	for{m in M}
+	{
+		printf "\n\tParte\t %s", m;
+		printf "\n\t\tCantidad Enviada al Basurero\t %s", xjDm[j,m];
+		printf "\n\t\tCantidad Enviada a Reciclaje\t %s", xjRm[j,m];
+	}
+	printf "\n\n";
+}
+
+for{k in K}
+{
+	printf "\nCentro de Procesamiento\t %s", k;
+	for{m in M}
+	{
+		printf "\n\tParte\t %s", m;
+		printf "\n\t\tCantidad Enviada al Basurero\t %s", xkDm[k,m];
+		printf "\n\t\tCantidad Enviada a Reciclaje\t %s", xkRm[k,m];
+		printf "\n\t\tCantidad Enviada a Fabrica\t %s", xkFm[k,m];
+	}
+	printf "\n\n";
+}
+
+
+for{m in M}
+{
+		printf "\nCantidad de partes %s enviada desde el Suplidor al Manufacturador:\t %s", m, ySFm[m];
+}
+
+
+for{j in J}
+{
+	printf "\n\nCentro de Desamblaje %s", j;
+	for{p in P}
+	{
+		printf "\n\tProducto %s , Estado %s \t\t[1, activo][0, no activo]", p, zjp[j,p];
+	}
+}
+
+for{k in K}
+{
+	printf "\n\nCentro de Procesamiento %s", k;
+	for{m in M}
+	{
+		printf "\n\tParte %s , Estado %s \t\t[1, activo][0, no activo]", m, wkm[k,m];
+	}
+}
 
 
 printf "\n\n\n";
