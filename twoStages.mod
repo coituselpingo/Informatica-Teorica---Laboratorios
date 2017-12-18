@@ -44,6 +44,7 @@ solve;
 ###########################################
 ###########################################
 
+printf "CASO - Distribucion microprocesadores AMD Ryzen - 2017 - Trimestre I (Enero - Marzo)";
 printf "\n\n";
 for {j in J}
 {
@@ -88,6 +89,10 @@ for {j in J}
 
 printf "\n\n\n";
 
+printf "COSTO TOTAL MINIMIZADO\t %s", Z;
+
+printf "\n\n\n";
+
 ###########################################
 ###########################################
 
@@ -120,12 +125,13 @@ param cjk : 'K_1'  'K_2' := #unit cost of transportation from distribution J to 
       'J_2' 500     500
       'J_3' 500     500;
 
-param: gj := #Fixed cost of operatin distribution center J
+param: gj := #Fixed cost of operating distribution center J
       'J_1' 500
       'J_2' 500
       'J_3' 500;
 
 param W:= 3; #an upper limit on total number of DC that can be opened
+
 
 
 ###########################################

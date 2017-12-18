@@ -61,8 +61,9 @@ var wkm{k in K, m in M}, binary; #1 if processing center k is open; 0, otherwise
 
 minimize Z: sum{j in J, p in P}codjp[j,p]*zjp[j,p] + sum{k in K, m in M}copkm[k,m]*wkm[k,m] +
             sum{i in I, j in J, p in P}cijp[i,j,p]*xijp[i,j,p] + sum{i in I, k in K, p in P}cikp[i,k,p]*xikp[i,k,p] +
-            sum{j in J, k in K, m in M}cjkm[j,k,m]*xjkm[j,k,m] - sum{j in J, m in M}cjRm[j,m]*xjRm[j,m] + sum{k in K, m in M}ckFm[k,m]*xkFm[k,m] -
-            sum{k in K, m in M}ckRm[k,m]*xkRm[k,m] + sum{k in K, m in M}ckDm[k,m]*xkDm[k,m] + sum{m in M}cSFm[m]*ySFm[m];
+            sum{j in J, k in K, m in M}cjkm[j,k,m]*xjkm[j,k,m] + sum{j in J, m in M}cjRm[j,m]*xjRm[j,m] +
+						sum{k in K, m in M}ckFm[k,m]*xkFm[k,m] + sum{k in K, m in M}ckRm[k,m]*xkRm[k,m] +
+						sum{k in K, m in M}ckDm[k,m]*xkDm[k,m] + sum{m in M}cSFm[m]*ySFm[m];
 
 
 
@@ -83,6 +84,38 @@ solve;
 ###########################################
 ###########################################
 
+printf "\n\n\n";
+
+printf "\nCantidad Enviada a (Centr. de Desamblaje/Centr. de Procesamiento)\n";
+
+for{i in I}
+{
+	printf "\nCentro de Recogida\t %s", i;
+	for{p in P}
+	{
+		printf "\n\tProducto\t %s", p;
+		for {j in J}
+		{
+			printf "\n\t\tCentr. de Desamblaje %s \t Cantidad %s \t Costo Unidad %s", j, xijp[i,j,p];
+			printf "\n\t\t\t Costo Total %s", xijp[i,j,p]*cijp[i,j,p];
+			printf "-*-*-\n";
+		}
+
+		for {k in K}
+		{
+			printf "\n\t\tCentr. de Procesamiento %s \t Cantidad %s \t Costo Unidad %s", k, xikp[i,k,p];
+			printf "\n\t\t\t Costo Total %s", xikp[i,k,p]*cikp[i,k,p];
+		}
+	}
+}
+
+
+
+printf "\n\n\n";
+
+printf "COSTO TOTAL MINIMIZADO\t %s", Z;
+
+printf "\n\n\n";
 
 ###########################################
 ###########################################

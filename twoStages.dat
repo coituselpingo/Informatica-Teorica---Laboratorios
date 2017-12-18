@@ -1,0 +1,38 @@
+set I:= 'AMD_Brasil', 'AMD_Mexico';
+set J:= 'DC_Trujillo', 'DC_Lima', 'DC_Arequipa';
+set K:= 'Piura', 'Trujillo', 'Chimbote', 'Lima', 'Ica', 'Arequipa', 'Tacna';
+
+
+param: ai := #capacity of plants I
+      'AMD_Brasil' 20000
+      'AMD_Mexico' 15000;
+
+param: bj := #capacity of distribution center J
+      'DC_Trujillo'   4000
+      'DC_Lima'   8000
+      'DC_Arequipa'   3000;
+
+param: dk := #demand of customer K
+      'Piura'	1200
+      'Trujillo'	1800
+			'Chimbote'	800
+			'Lima'	3000
+			'Ica'	400
+			'Arequipa'	1800
+			'Tacna'	400;
+
+param tij :	 'DC_Trujillo'  'DC_Lima'  'DC_Arequipa' := #unit cost of transportation from plant i to distribution center j
+'AMD_Brasil'	8    					12					10
+'AMD_Mexico'	12						10					20;
+
+param cjk 	: 	'Piura'		'Trujillo'	'Chimbote'	'Lima'	'Ica'	'Arequipa'	'Tacna' := #unit cost of transportation from distribution J to customer K
+'DC_Trujillo'		10				2						8						20			24		40					80
+'DC_Lima'				25				20					10					2				8			30					60
+'DC_Arequipa' 	40     		50					45					35			20		2						10;
+
+param: gj := #Fixed cost of operatin distribution center J
+      'DC_Trujillo' 3000
+      'DC_Lima' 12000
+      'DC_Arequipa' 4500;
+
+param W:= 3; #an upper limit on total number of DC that can be opened

@@ -1,0 +1,56 @@
+c Problem:    twoStages
+c Rows:       17
+c Columns:    30
+c Non-zeros:  111
+c Status:     INTEGER UNDEFINED
+c Objective:  Z = 0 (MINimum)
+c
+s mip 17 30 u 0
+i 1 0
+i 2 0
+i 3 0
+i 4 0
+i 5 0
+i 6 0
+i 7 0
+i 8 0
+i 9 0
+i 10 0
+i 11 0
+i 12 0
+i 13 0
+i 14 0
+i 15 0
+i 16 0
+i 17 0
+j 1 0
+j 2 0
+j 3 0
+j 4 0
+j 5 0
+j 6 0
+j 7 0
+j 8 0
+j 9 0
+j 10 0
+j 11 0
+j 12 0
+j 13 0
+j 14 0
+j 15 0
+j 16 0
+j 17 0
+j 18 0
+j 19 0
+j 20 0
+j 21 0
+j 22 0
+j 23 0
+j 24 0
+j 25 0
+j 26 0
+j 27 0
+j 28 0
+j 29 0
+j 30 0
+e o f
