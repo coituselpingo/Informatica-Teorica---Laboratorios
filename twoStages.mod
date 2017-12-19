@@ -19,8 +19,8 @@ param W; #an upper limit on total number of DC that can be opened
 
 ###########################################
 
-var xij{i in I, j in J}, integer; #Amount of shipment from plant i to distribution centre j.
-var yjk{j in J, k in K}, integer; #Amount of shipment from distribution centre j to customer k.
+var xij{i in I, j in J} >= 0, integer; #Amount of shipment from plant i to distribution centre j.
+var yjk{j in J, k in K} >= 0, integer; #Amount of shipment from distribution centre j to customer k.
 var zj{j in J}, binary; #Binary 1 if DC j is opened. Other case 0.
 
 ###########################################

@@ -37,10 +37,6 @@ param cSFm{m in M}; #Unit cost of shipping from supplier S to manufacturer F for
 param codjp{j in J, p in P}; #The fixed opening cost for disassembly center j for product p op
 param copkm{k in K, m in M}; #The fixed opening cost for processing center k for part m
 
-
-param sLm{m in M}; #Limite de oferta por suplidor
-
-
 ###########################################
 
 var xijp{i in I, j in J, p in P} >= 0, integer; #Amount shipped from returning center i to disassembly center j for product p
@@ -73,19 +69,15 @@ minimize Z: sum{j in J, p in P}codjp[j,p]*zjp[j,p] + sum{k in K, m in M}copkm[k,
 
 s.t. R1{i in I, p in P}: sum{j in J}xijp[i,j,p] + sum{k in K}xikp[i,k,p] <= aip[i,p];
 
-s.t. R2{j in J, p in P, m in M}: (sum{k in K}xjkm[j,k,m]) + xjRm[j,m] <= bjm[j,m]*zjp[j,p];
+s.t. R2{j in J, p in P, m in M}: sum {k in K}xjkm[j,k,m] + xjRm[j,m] <= bjm[j,m]*zjp[j,p];
 
-s.t. R3{m in M, k in K}: xkFm[k,m] + xkRm[k,m] + xkDm[k,m] <= ukm[k,m]*wkm[k,m];
+s.t. R3{m in M}: sum{k in K}(xkFm[k,m] + xkRm[k,m] + xkDm[k,m]) <= sum{k in K}ukm[k,m]*wkm[k,m];
 
 s.t. R4{p in P}: sum{j in J}zjp[j,p] <= nj;
 
 s.t. R5{m in M}: sum{k in K}wkm[k,m] <= nk;
 
 s.t. R6{m in M}: ySFm[m] + sum{k in K}xkFm[k,m] >= dm[m];
-
-
-s.t. R7{m in M}: ySFm[m] <= sLm[m];
-
 
 solve;
 
@@ -104,7 +96,7 @@ for{i in I}
 		printf "\n\tProducto\t %s", p;
 		for {j in J}
 		{
-			printf "\n\t\tCentr. de Desamblaje %s \t Cantidad %s \t Costo Unidad %s", j, xijp[i,j,p], cijp[i,j,p];
+			printf "\n\t\tCentr. de Desamblaje %s \t Cantidad %s \t Costo Unidad %s", j, xijp[i,j,p];
 			printf "\n\t\t\t Costo Total %s", xijp[i,j,p]*cijp[i,j,p];
 			printf "\n\t\t\t-*-*-\n";
 		}
@@ -112,7 +104,7 @@ for{i in I}
 		printf "\n\t\t#*#*#\n";
 		for {k in K}
 		{
-			printf "\n\t\tCentr. de Procesamiento %s \t Cantidad %s \t Costo Unidad %s", k, xikp[i,k,p], cikp[i,k,p];
+			printf "\n\t\tCentr. de Procesamiento %s \t Cantidad %s \t Costo Unidad %s", k, xikp[i,k,p];
 			printf "\n\t\t\t Costo Total %s", xikp[i,k,p]*cikp[i,k,p];
 			printf "\n\t\t\t-*-*-\n";
 		}
@@ -127,8 +119,8 @@ for{j in J}
 		printf "\n\tCentro de Procesamiento\t %s", k;
 		for {m in M}
 		{
-			printf "\n\t\tParte %s \t Cantidad %s \t Costo Unidad %s", m, xjkm[j,k,m], cjkm[j,k,m];
-			printf "\n\t\t\t Costo Total %s", xjkm[j,k,m]*cjkm[j,k,m];
+			printf "\n\t\tParte %s \t Cantidad %s \t Costo Unidad %s", m, xjkm[j,k,m];
+			printf "\n\t\t\t Costo Total %s", xjkm[j,k,m]*xjkm[j,k,m];
 			printf "\n\t\t\t-*-*-\n";
 		}
 	}
@@ -221,30 +213,23 @@ param nj:= 3; #number of elementes in J
 param nk:= 2; #number of elements in K
 
 param aip: 'P_1':= #capacity of returning center i  for producto p
-      'I_1' 10000
-      'I_2' 20000;
+      'I_1' 1000
+      'I_2' 2000;
 
 param bjm: 'M_1'  'M_2'  'M_3':= #capacity of disassembly center j for part m
-    'J_1'   800    800    800
-    'J_2'   1200   1200   1200
-    'J_3'   1500    1500    1500;
+    'J_1'   500    500    500
+    'J_2'   500    500    500
+    'J_3'   500    500    500;
 
 param ukm: 'M_1'  'M_2'  'M_3':= #capacity of processing center k for part m
-      'K_1' 1600    1600    1600
-      'K_2' 1400    1400    1400;
+      'K_1' 500    500    500
+      'K_2' 500    500    500;
 
 param ur:= 10000; #capacity of recycling
-
 param: dm := #Demand of part m in manufacturer F
-'M_1' 3000
-'M_2' 3000
-'M_3' 3000;
-
-param: sLm := #Limite de Oferta por Surtidor
 'M_1' 500
 'M_2' 500
 'M_3' 500;
-
 param: nm :=  #number of part for the type m from disassembling one unit of product
 'M_1' 10
 'M_2' 8
@@ -252,61 +237,61 @@ param: nm :=  #number of part for the type m from disassembling one unit of prod
 
 param cijp :=  #unit cost of shipping from returning center i to disassembly j for product p
 [*,*,'P_1']: 'J_1'  'J_2'  'J_3' :=
-'I_1'        20    20    20
-'I_2'        20    20    20;
+'I_1'        500    500    500
+'I_2'        500    500    500;
 
 param cikp := #Unit cost of shipping from returning center i to processing center k for product p
 [*,*,'P_1']: 'K_1'  'K_2' :=
-'I_1'        15    15
-'I_2'        15    15;
+'I_1'        500    500
+'I_2'        500    500;
 
 param cjkm := #Unit cost of shipping from disassembly center j to processing center k for part m
 [*,*,'M_1']: 'K_1'  'K_2' :=
-'J_1'        10    10
-'J_2'        10    10
-'J_3'        10    10
+'J_1'        500    500
+'J_2'        500    500
+'J_3'        500    500
 
 [*,*,'M_2']: 'K_1'  'K_2' :=
-'J_1'        18    18
-'J_2'        18    18
-'J_3'        18    18
+'J_1'        500    500
+'J_2'        500    500
+'J_3'        500    500
 
 [*,*,'M_3']: 'K_1'  'K_2' :=
-'J_1'        25    25
-'J_2'        25    25
-'J_3'        25    25;
+'J_1'        500    500
+'J_2'        500    500
+'J_3'        500    500;
 
 param cjRm : 'M_1'  'M_2'  'M_3' := #Unit cost of shipping from disassembly center j to recycling R for part m
-        'J_1' 5    5      5
-        'J_2' 5    5      5
-        'J_3' 5    5      5;
+        'J_1' 10    10      10
+        'J_2' 10    10      10
+        'J_3' 10    10      10;
 
 param ckFm : 'M_1'  'M_2'  'M_3' :=  #Unit cost of shipping from processing center k to manufacturer F for part m
-        'K_1' 16    16     16
-        'K_2' 16    16     16;
+        'K_1' 10    10     10
+        'K_2' 10    10     10;
 
 
 param ckRm : 'M_1'  'M_2'  'M_3' := #Unit cost of shipping from processing center k to recycling R for part m
-        'K_1' 8    8     8
-        'K_2' 8    8     8;
+        'K_1' 10    10     10
+        'K_2' 10    10     10;
 
 param ckDm : 'M_1'  'M_2'  'M_3' := #Unit cost of shipping from processing center k to disposal D for part m
-        'K_1' 4    4     4
-        'K_2' 4    4     4;
+        'K_1' 10    10     10
+        'K_2' 10    10     10;
 
 param cSFm := #Unit cost of shipping from supplier S to manufacturer F for part m
-        'M_1' 30
-        'M_2' 30
-        'M_3' 30;
+        'M_1' 10
+        'M_2' 10
+        'M_3' 10;
 
 param codjp: 'P_1' := #The fixed opening cost for disassembly center j for product p op
-    'J_1'     1000
-    'J_2'     1000
-    'J_3'     1000;
+    'J_1'     500
+    'J_2'     500
+    'J_3'     500;
 
 param copkm: 'M_1'  'M_2'  'M_3' := #The fixed opening cost for processing center k for part m
-    'K_1'     400   200    400
-    'K_2'     200   400    200;
+    'K_1'     500   500    500
+    'K_2'     500   500    500;
 
 ###########################################
 ###########################################
