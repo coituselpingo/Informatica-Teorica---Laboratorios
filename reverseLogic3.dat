@@ -1,0 +1,100 @@
+set I:=  'Piura', 'Trujillo', 'Chimbote', 'Lima', 'Arequipa';
+set J:=  'D_Trujillo', 'D_Lima', 'D_Arequipa';
+set K:= 'P_Lima', 'P_Bogota', 'P_Santiago', 'P_SaoPaulo', 'P_BuenosAires';
+
+set M:= 'Refur_Santiago';
+
+set R:= 'Recy_BuenosAires';
+set S:= 'Sup_SaoPaulo';
+set D:= 'Dispo_Bogota';
+
+param nj:= 3; #number of elementes in J
+param nk:= 2; #number of elements in K
+
+param 				:		aip:=
+		'Piura'				200
+		'Trujillo'		800
+		'Chimbote'		250
+		'Lima'				1200
+		'Arequipa'		600;
+
+param 				:		bjm:=
+		'D_Trujillo'  1500
+		'D_Lima'  		2000
+		'D_Arequipa'  1500;
+
+param 				:			ukm:=
+		'P_Lima' 				2000
+		'P_Bogota' 			1800
+		'P_Santiago' 		3000
+		'P_SaoPaulo' 		3400
+		'P_BuenosAires'	2600;
+
+param 				:				dm:=
+		'Refur_Santiago' 	3700;
+
+param 				:			 		ur:=
+		'Recy_BuenosAires'	4200;
+
+param 				:				ud:=
+		'Dispo_Bogota' 		8000;
+
+param	 cijp	: 'D_Trujillo' 'D_Lima' 'D_Arequipa':=
+		'Piura'			20					40				80
+		'Trujillo'  4						22				70
+		'Chimbote' 	16					14				60
+		'Lima'			24					4					50
+		'Arequipa' 	64					45				8;
+
+param cikp: 'P_Lima' 'P_Bogota' 'P_Santiago' 'P_SaoPaulo' 'P_BuenosAires':=
+	'Piura'			150			0					0							0						0
+	'Trujillo' 	140			0					0							0						0
+	'Chimbote' 	250			0					0							0						0
+	'Lima' 			250			0					0							0						0
+	'Arequipa' 	250			0					0							0						0;
+
+param cjkm: 			'P_Lima' 'P_Bogota' 'P_Santiago' 'P_SaoPaulo' 'P_BuenosAires':=
+		'D_Trujillo' 	26				0					0							30					0
+		'D_Lima' 			43				0					24						0						0
+		'D_Arequipa' 	15				0					0							23					0;
+
+param cjRm: 		'Recy_BuenosAires':=
+		'D_Trujillo'	110
+		'D_Lima'			85
+		'D_Arequipa'	70;
+
+param ckRm:	 'Recy_BuenosAires':=
+		'P_Lima'				0
+		'P_Bogota'			11
+		'P_Santiago'		0
+		'P_SaoPaulo'		12
+		'P_BuenosAires'	0;
+
+param ckFm: 		'Refur_Santiago':=
+		'P_Lima'				0
+		'P_Bogota' 			10
+		'P_Santiago'		0
+		'P_SaoPaulo'		10
+		'P_BuenosAires'	0;
+
+param ckDm: 	'Dispo_Bogota':=
+		'P_Lima'				0
+		'P_Bogota'			10
+		'P_Santiago'		0
+		'P_SaoPaulo'		10
+		'P_BuenosAires' 0;
+
+param 		: 		codjp:=
+		'D_Trujillo'	12
+		'D_Lima' 			10
+		'D_Arequipa'	9;
+
+param 				: 		copkm:=
+		'P_Lima'					10
+		'P_Bogota'				11
+		'P_Santiago'			10
+		'P_SaoPaulo'			12
+		'P_BuenosAires'		10;
+
+param cSFm: 	'Refur_Santiago':=
+		'Sup_SaoPaulo'		12;

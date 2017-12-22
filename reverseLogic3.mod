@@ -100,31 +100,38 @@ solve;
 
 ###########################################
 
-printf '\n';
-printf 'Costo transporte Centros de Retorno aip Centros de Clasificacion: %s\n', sum{i in I, j in J} cijp[i,j]*xijp[i,j];
-printf '\n';
-printf '......................................................................';
-printf '\n';
-	printf 'Centro_Retorno Centro_Clasificacion Cantidad\n';
+printf "\n\n\n";
+printf "RECICLAJE DE MICROPROCESADORES ATHLOM";
+
+printf "\n\n*~*~*~*\n\n";
+printf '\n\n';
+
+printf 'Costo Total Centros de Retorno - Centros de Desensamblaje:\t %s\n', sum{i in I, j in J}cijp[i,j]*xijp[i,j];
+printf '\n\n#-#-#-# \n\n';
+
 for {i in I} {
+	printf "\nCentro de Retorno :\t %s", i;
 	for {j in J} {
-		printf ' %6s%15s%22s\n',i,j, xijp[i,j];
+		printf "\n\tCentro de Desensamblaje :\t %s", j;
+		printf "\n\t\tCantidad Transportada :\t %s", xijp[i,j];
 	}
 }
 
-printf '\n';
-printf '......................................................................';
-printf '\n';
+printf "\n\n*~*~*~*\n\n";
+printf '\n\n';
 
-printf 'Costo transporte Centros de Retorno aip Centros de Transformacion: %s\n', sum{i in I, k in K} cikp[i,k]*xikp[i,k];
-printf '\n';
+printf '\n\n';
+printf 'Costo Total Centros de Retorno - Centros de Procesamiento:\t %s\n', sum{i in I, k in K}cikp[i,k]*xikp[i,k];
+printf '\n\n#-#-#-# \n\n';
 
-	printf 'Centro_Retorno Centro_Transformacion Cantidad\n';
 for {i in I} {
+	printf "\nCentro de Retorno :\t %s", i;
 	for {k in K} {
-		printf ' %6s%15s%22s\n',i,k, xikp[i,k];
+		printf "\n\tCentro de Procesamiento :\t %s", k;
+		printf "\n\t\tCantidad Transportada :\t %s", xikp[i,k];
 	}
 }
+
 
 
 printf '\n';
@@ -239,108 +246,5 @@ printf '';
 
 ###########################################
 ###########################################
-
-data;
-
-set I:=  'Piura', 'Trujillo', 'Chimbote', 'Lima', 'Arequipa';
-set J:=  'D_Trujillo', 'D_Lima', 'D_Arequipa';
-set K:= 'P_Lima', 'P_Bogota', 'P_Santiago', 'P_SaoPaulo', 'P_BuenosAires';
-
-set M:= 'Refur_Santiago';
-
-set R:= 'Recy_BuenosAires';
-set S:= 'Sup_SaoPaulo';
-set D:= 'Dispo_Bogota';
-
-param nj:= 3; #number of elementes in J
-param nk:= 2; #number of elements in K
-
-param 				:		aip:=
-		'Piura'				18
-		'Trujillo'		60
-		'Chimbote'		50
-		'Lima'				40
-		'Arequipa'		50;
-
-param 				:		bjm:=
-		'D_Trujillo'  80
-		'D_Lima'  		150
-		'D_Arequipa'  100;
-
-param 				:			ukm:=
-		'P_Lima' 				100
-		'P_Bogota' 			180
-		'P_Santiago' 		50
-		'P_SaoPaulo' 		15
-		'P_BuenosAires'	10;
-
-param 					: dm:=
-'Refur_Santiago' 	100;
-
-param 			:			 ur:=
-'Recy_BuenosAires' 100;
-
-param 			:			ud:=
-'Dispo_Bogota' 		100;
-
-param	 cijp	: 'D_Trujillo' 'D_Lima' 'D_Arequipa':=
-		'Piura'			0						18				0
-		'Trujillo'  10					0					12
-		'Chimbote' 	0						13				0
-		'Lima'			16					0					14
-		'Arequipa' 	0						20				0;
-
-param cikp: 'P_Lima' 'P_Bogota' 'P_Santiago' 'P_SaoPaulo' 'P_BuenosAires':=
-'Piura' 150 0 0 0 0
-'Trujillo' 140 0 0 0 0
-'Chimbote' 250 0 0 0 0
-'Lima' 250 0 0 0 0
-'Arequipa' 250 0 0 0 0;
-
-param cjkm: 'P_Lima' 'P_Bogota' 'P_Santiago' 'P_SaoPaulo' 'P_BuenosAires':=
-'D_Trujillo' 26 0 0 30 0
-'D_Lima' 43 0 24 0 0
-'D_Arequipa' 15 0 0 23 0;
-
-param cjRm: 'Recy_BuenosAires':=
-'D_Trujillo' 110
-'D_Lima' 85
-'D_Arequipa' 70;
-
-param ckFm: 'Refur_Santiago':=
-'P_Lima' 0
-'P_Bogota' 10
-'P_Santiago' 0
-'P_SaoPaulo' 10
-'P_BuenosAires' 0;
-
-param ckRm: 'Recy_BuenosAires':=
-'P_Lima' 0
-'P_Bogota' 11
-'P_Santiago' 0
-'P_SaoPaulo' 12
-'P_BuenosAires' 0;
-
-param ckDm: 'Dispo_Bogota':=
-'P_Lima' 0
-'P_Bogota' 10
-'P_Santiago' 0
-'P_SaoPaulo' 10
-'P_BuenosAires' 0;
-
-param codjp:=
-'D_Trujillo' 12
-'D_Lima' 10
-'D_Arequipa' 9;
-
-param copkm:=
-'P_Lima' 10
-'P_Bogota' 11
-'P_Santiago' 10
-'P_SaoPaulo' 12
-'P_BuenosAires' 10;
-
-param cSFm: 'Refur_Santiago' :=
-'Sup_SaoPaulo' 12;
 
 end;
