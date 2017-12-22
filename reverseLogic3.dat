@@ -12,29 +12,29 @@ param nj:= 3; #number of elementes in J
 param nk:= 2; #number of elements in K
 
 param 				:		aip:=
-		'Piura'				20
-		'Trujillo'		80
-		'Chimbote'		25
-		'Lima'				120
-		'Arequipa'		60;
+		'Piura'				200
+		'Trujillo'		800
+		'Chimbote'		250
+		'Lima'				1200
+		'Arequipa'		600;
 
 param 				:		bjm:=
-		'D_Trujillo'  150
-		'D_Lima'  		200
-		'D_Arequipa'  150;
+		'D_Trujillo'  1500
+		'D_Lima'  		2000
+		'D_Arequipa'  1500;
 
 param 				:			ukm:=
-		'P_Lima' 				200
-		'P_Bogota' 			180
-		'P_Santiago' 		300
-		'P_SaoPaulo' 		340
-		'P_BuenosAires'	260;
+		'P_Lima' 				2000
+		'P_Bogota' 			1800
+		'P_Santiago' 		3000
+		'P_SaoPaulo' 		3400
+		'P_BuenosAires'	2600;
 
 param 				:				dm:=
-		'Refur_Santiago' 	120;
+		'Refur_Santiago' 	3000;
 
 param 				:			 		ur:=
-		'Recy_BuenosAires'	60;
+		'Recy_BuenosAires'	600;
 
 param 				:				ud:=
 		'Dispo_Bogota' 		500;
@@ -50,16 +50,16 @@ param	 cijp	: 'D_Trujillo' 'D_Lima' 'D_Arequipa':=
 		'Arequipa' 	64					45				8;
 
 param cikp: 'P_Lima' 'P_Bogota' 'P_Santiago' 'P_SaoPaulo' 'P_BuenosAires':=
-	'Piura'			150			0					0							0						0
-	'Trujillo' 	140			0					0							0						0
-	'Chimbote' 	250			0					0							0						0
-	'Lima' 			250			0					0							0						0
-	'Arequipa' 	250			0					0							0						0;
+	'Piura'			40			32					48							45						64
+	'Trujillo' 	22			44					32							40						58
+	'Chimbote' 	14			72					52							54						94
+	'Lima' 			4				58					38							40						58
+	'Arequipa' 	45			60					25							30						50;
 
 param cjkm: 			'P_Lima' 'P_Bogota' 'P_Santiago' 'P_SaoPaulo' 'P_BuenosAires':=
-		'D_Trujillo' 	26				0					0							30					0
-		'D_Lima' 			43				0					24						0						0
-		'D_Arequipa' 	15				0					0							23					0;
+		'D_Trujillo' 	26				12					28						30					42
+		'D_Lima' 			43				18					24						28					35
+		'D_Arequipa' 	15				30					14						25					30;
 
 param cjRm: 		'Recy_BuenosAires':=
 		'D_Trujillo'	110
@@ -67,37 +67,37 @@ param cjRm: 		'Recy_BuenosAires':=
 		'D_Arequipa'	70;
 
 param ckRm:	 'Recy_BuenosAires':=
-		'P_Lima'				0
-		'P_Bogota'			11
-		'P_Santiago'		0
-		'P_SaoPaulo'		12
-		'P_BuenosAires'	0;
+		'P_Lima'				30
+		'P_Bogota'			50
+		'P_Santiago'		10
+		'P_SaoPaulo'		26
+		'P_BuenosAires'	4;
 
 param ckFm: 		'Refur_Santiago':=
-		'P_Lima'				0
-		'P_Bogota' 			10
-		'P_Santiago'		0
-		'P_SaoPaulo'		10
-		'P_BuenosAires'	0;
+		'P_Lima'				22
+		'P_Bogota' 			42
+		'P_Santiago'		6
+		'P_SaoPaulo'		32
+		'P_BuenosAires'	12;
 
 param ckDm: 	'Dispo_Bogota':=
-		'P_Lima'				0
-		'P_Bogota'			10
-		'P_Santiago'		0
-		'P_SaoPaulo'		10
-		'P_BuenosAires' 0;
-
-param 		: 		codjp:=
-		'D_Trujillo'	12
-		'D_Lima' 			10
-		'D_Arequipa'	9;
-
-param 				: 		copkm:=
-		'P_Lima'					10
-		'P_Bogota'				11
-		'P_Santiago'			10
-		'P_SaoPaulo'			12
-		'P_BuenosAires'		10;
+		'P_Lima'				18
+		'P_Bogota'			2
+		'P_Santiago'		36
+		'P_SaoPaulo'		30
+		'P_BuenosAires' 25;
 
 param cSFm: 	'Refur_Santiago':=
-		'Sup_SaoPaulo'		12;
+				'Sup_SaoPaulo'		28;
+
+param 		: 		codjp:=
+		'D_Trujillo'	15000
+		'D_Lima' 			20000
+		'D_Arequipa'	12000;
+
+param 				: 		copkm:=
+		'P_Lima'					20000
+		'P_Bogota'				24000
+		'P_Santiago'			50000
+		'P_SaoPaulo'			48000
+		'P_BuenosAires'		30000;

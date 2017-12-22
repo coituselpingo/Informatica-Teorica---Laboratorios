@@ -93,11 +93,13 @@ s.t. R7{k in K}: wkm[k]<= nk ;
 s.t. R8{r in R}: sum{j in J}xjRm[j,r] + sum{k in K}xkRm[k,r] <= ur[r];
 #Control de flujo que evita se supere el limite de los centros Reciclaje
 s.t. R9{d in D}: sum{k in K}xkDm[k,d] <= ud[d];
-#Control de flujo que evita se supere el limite de los centros de Dispensacion"
+#Control de flujo que evita se supere el limite de los centros de Dispensacion
 s.t. R10{m in M}: sum{s in S}ySFm[s,m] + sum{k in K}xkFm[k,m] >= dm[m];
-#Control de flujo que evita no pueda superar el limite de demanda"
+#Control de flujo obliga a satisfacer la demanda de los centros de Remanufactura
 s.t. R11{s in S}: sum{m in M}ySFm[s,m] <= us[s];
-#Control de flujo que evita se supere el limite de los centros de suministros"
+#Control de flujo que evita se supere el limite de los centros de suministros
+s.t. R12{j in J}: sum{i in I}xijp[i,j] = sum{k in K}xjkm[j,k];
+#conservacion de flujo entre J - K
 solve;
 
 ###########################################
@@ -125,7 +127,7 @@ printf "\n\n*~*~*~*\n\n";
 printf '\n\n';
 
 printf '\n\n';
-printf 'Costo Total Centros de Desensamblaje - Centros de Procesamiento:\t %s\n', sum{i in I, k in K}cikp[i,k]*xikp[i,k];
+printf 'Costo Total Centros de Retorno - Centros de Procesamiento:\t %s\n', sum{i in I, k in K}cikp[i,k]*xikp[i,k];
 printf '\n\n#-#-#-# \n\n';
 
 for {i in I}
