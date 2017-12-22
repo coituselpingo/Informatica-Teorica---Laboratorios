@@ -4,7 +4,7 @@ set I; #return centers
 set J; #disassembly centers
 set K; #processing centers
 
-set M; #parts
+set M; #refurbished centers
 
 set R; #recycling centers
 set S; #supplier centers
@@ -12,83 +12,103 @@ set D; #disposal centers
 
 
 ###########################################
+param nj; #number of elementes in J
+param nk; #number of elements in K
+
+param aip{i in I}; #capacity of returning center i
+param bjm{j in J}; #capacity of disassembly center j
+param ukm{k in K}; #capacity of processing center k
+
+param dm{m in M}; #capacity of refurbished center m
+
+param ur{r in R}; #capacity of recycling
+param us{s in S}; #capacity of supplier
+param ud{d in D}; #capacity of disposal
+
+param cijp{i in I, j in J}; #unit cost of shipping from returning center i to disassembly j
+param cikp{i in I, k in K}; #Unit cost of shipping from returning center i to processing center k
+param cjkm{j in J, k in K}; #Unit cost of shipping from disassembly center j to processing center k
+
+param cjRm{j in J, r in R}; #Unit cost of shipping from disassembly center j to recycling r
+
+param ckFm{k in K, m in M}; #Unit cost of shipping from processing center k to refurbished m
+param ckRm{k in K, r in R}; #Unit cost of shipping from processing center k to recycling r
+param ckDm{k in K, d in D}; #Unit cost of shipping from processing center k to disposal d
+
+param cSFm{s in S,m in M}; #Unit cost of shipping from supplier s to refurbished m
+
+param codjp{j in J}; #The fixed opening cost for disassembly center j
+param copkm{k in K}; #The fixed opening cost for processing center k
+
+###########################################
+
+var xijp{i in I, j in J} >= 0, integer; #Amount shipped from returning center i to disassembly center j
+var xikp{i in I, k in K} >= 0, integer; #Amount shipped from returning center i to processing center k
+var xjkm{j in J, k in K} >= 0, integer; #Amount shipped from disassembly center j to processing center k
+
+var xjDm{j in J,d in D} >= 0, integer; #Amount shipped from disassembly center j to disposal d
+var xjRm{j in J, r in R} >= 0, integer; #Amount shipped from disassembly center j to recycling r
+
+var xkFm{k in K, m in M} >= 0, integer; #Amount shipped from processing center k to refurbished m
+var xkRm{k in K, r in R} >= 0, integer; #Amount shipped from processing center k to recycling r
+var xkDm{k in K, d in D} >= 0, integer; #Amount shipped from processing center k to disposal d
+
+var ySFm{s in S, m in M} >= 0, integer; #Amount shipped from supplier s to refurbished m
+
+var zjp{j in J}, binary; #1 if disassembly center j is open; 0, otherwise.
+var wkm{k in K}, binary; #1 if processing center k is open; 0, otherwise.
+
+
+###########################################
+###########################################
+
+minimize Z :
+	sum{j in J}codjp[j]*zjp[j] + #Fix Cost by Open disassembly center
+	sum{k in K}copkm[k]*wkm[k] + #Fix Cost by Open processing center
+	sum{i in I, j in J}cijp[i,j]*xijp[i,j] + #Cost for transport between return centers and disassembly centers
+	sum{i in I, k in K}cikp[i,k]*xikp[i,k] + #Cost for transport between return centers and processing centers
+	sum{j in J, k in K}cjkm[j,k]*xjkm[j,k] - #Cost for transport between disassembly centers and processing centers
+	sum{j in J, r in R}cjRm[j,r]*xjRm[j,r] + #Cost (inverse) for transport between disassembly centers and Recycling centers
+	sum{k in K, m in M}ckFm[k,m]*xkFm[k,m] - #Cost for transport between processing centers and refurbished centers
+	sum{k in K, r in R}ckRm[k,r]*xkRm[k,r] + #Cost (inverse) for transport between processing centers and Recycling centers
+	sum{k in K, d in D}ckDm[k,d]*xkDm[k,d] + #Cost for transport between processing centers and disposal centers
+	sum{s in S, m in M}cSFm[s,m]*ySFm[s,m]; #Cost for transport between supplier centers and refurbished centers
 
 
 
-param a{i in I };
-                  param b{j in J };
-                  param u{k in K };
-                  param dM{m in M}; #capacidad de remanufactura
-				  param uR{r in R}; #capacidad de reciclaje
-                  param uS{s in S}; # capacidad del proveedor
-                  param uD{d in D}; #capacidad de disposal
+s.t. R1{i in I}: sum{j in J} xijp[i,j] + sum{k in K} xikp[i,k] >= aip[i]; #
 
-     #costos  transporte
-param c1{i in I , j in J};
-param c2{i in I, k in K};
-param c3{j in J , k in K};
-param c5{j in J , r in R};
-param c6{k in K, m in M};
-param c7{k in K, r in R};
-param c8{k in K,d in D};
-param c9{j in J};
-param c10{k in K};
-param c11{s in S,m in M};
+s.t. R2{j in J}: sum{k in K} xjkm[j,k] + sum{r in R} xjRm[j,r] <= bjm[j]*zjp[j];
 
-                                                   #variables
+s.t. R3{k in K}: sum{m in M}xkFm[k,m] + sum{r in R}xkRm[k,r] + sum{d in D}xkDm[k,d] <= ukm[k]*wkm[k]; #only for one product with one piece
 
-var x1{i in I , j in J} >= 0 ,integer ;
-var x2{i in I , k in K} >= 0 ,integer ;
-var x3{j in J , k in K} >= 0 ,integer ;
-var x5{j in J , r in R} >= 0 ,integer ;
-var x6{k in K , m in M} >= 0 ,integer ;
-var x7{k in K , r in R} >= 0 ,integer ;
-var x8{k in K , d in D} >= 0 ,integer ;
-var  y{s in S , m in M} >= 0 ,integer ;
+s.t. R4{j in J}: sum{i in I}xijp[i,j] = sum{k in K}xjkm[j,k] + sum{r in R}xjRm[j,r] ;
 
-var z{j in J} , binary;
-var w{k in K}, binary;
+s.t. R5{k in K}: sum{i in I}xikp[i,k] + sum{j in J}xjkm[j,k] = sum{m in M}xkFm[k,m] + sum{r in R}xkRm[k,r] + sum{d in D}xkDm[k,d] ;
 
+s.t. R6{j in J}: zjp[j]<= nj;
 
-minimize Z : sum{j in J} c9[j]*z[j]  +
-			 sum{k in K} c10[k]*w[k] +
-			 sum{i in I,j in J} c1[i,j]*x1[i,j]  +
-			 sum{i in I,k in K} c2[i,k]*x2[i,k]  +
-			 sum{j in J,k in K} c3[j,k]*x3[j,k]  -
-			 sum{j in J, r in R} c5[j,r]*x5[j,r] +
-			 sum{k in K, m in M} c6[k,m]*x6[k,m] -
-			 sum{k in K, r in R} c7[k,r]*x7[k,r] +
-			 sum{k in K , d in D} c8[k,d]*x8[k,d]+
-			 sum{s in S,m in M} c11[s,m]*y[s,m];
+s.t. R7{k in K}: wkm[k]<= nk ;
 
+s.t. R8{r in R}: sum{j in J}xjRm[j,r] + sum{k in K}xkRm[k,r] <= ur[r];
 
+s.t. R9{d in D}: sum{k in K}xkDm[k,d] <= ud[d];
 
-s.t. R1{i in I}: sum{j in J} x1[i,j] + sum{k in K} x2[i,k] >= a[i];
-s.t. R2{j in J}: sum{k in K} x3[j,k] + sum{r in R} x5[j,r] <= b[j]*z[j];
-s.t. R3{k in K}: ( sum{m in M} x6[k,m] + sum{r in R} x7[k,r] + sum{d in D} x8[k,d])<= u[k]*w[k];
-s.t. R4{j in J}: (sum{i in I} x1[i,j]) = (sum{k in K} x3[j,k])  + (sum{r in R} x5[j,r]) ;
-s.t. R5{k in K}: (sum{i in I} x2[i,k]) + (sum{j in J} x3[j,k]) = (sum{m in M} x6[k,m]) + (sum{r in R} x7[k,r]) + (sum{d in D} x8[k,d]) ;
-s.t. R6{j in J}: z[j]<= 3;
-s.t. R7{k in K}: w[k]<= 5 ;
-s.t. R8{r in R}: (sum{j in J} x5[j,r]) + (sum{k in K} x7[k,r]) <= uR[r];
-s.t. R9{d in D}:  (sum{k in K} x8[k,d]) <= uD[d];
-s.t. R10{m in M}: sum{s in S} y[s,m] + sum{k in K} x6[k,m] >= dM[m];
-
-
-
-
+s.t. R10{m in M}: sum{s in S}ySFm[s,m] + sum{k in K}xkFm[k,m] >= dm[m];
 
 solve;
 
+###########################################
+
 printf '\n';
-printf 'Costo transporte Centros de Retorno a Centros de Clasificacion: %s\n', sum{i in I, j in J} c1[i,j]*x1[i,j];
+printf 'Costo transporte Centros de Retorno aip Centros de Clasificacion: %s\n', sum{i in I, j in J} cijp[i,j]*xijp[i,j];
 printf '\n';
 printf '......................................................................';
 printf '\n';
 	printf 'Centro_Retorno Centro_Clasificacion Cantidad\n';
 for {i in I} {
 	for {j in J} {
-		printf ' %6s%15s%22s\n',i,j, x1[i,j];
+		printf ' %6s%15s%22s\n',i,j, xijp[i,j];
 	}
 }
 
@@ -96,13 +116,13 @@ printf '\n';
 printf '......................................................................';
 printf '\n';
 
-printf 'Costo transporte Centros de Retorno a Centros de Transformacion: %s\n', sum{i in I, k in K} c2[i,k]*x2[i,k];
+printf 'Costo transporte Centros de Retorno aip Centros de Transformacion: %s\n', sum{i in I, k in K} cikp[i,k]*xikp[i,k];
 printf '\n';
 
 	printf 'Centro_Retorno Centro_Transformacion Cantidad\n';
 for {i in I} {
 	for {k in K} {
-		printf ' %6s%15s%22s\n',i,k, x2[i,k];
+		printf ' %6s%15s%22s\n',i,k, xikp[i,k];
 	}
 }
 
@@ -111,12 +131,12 @@ printf '\n';
 printf '.....................................................................';
 printf '\n';
 
-printf 'Costo transporte Centros de Clasificacion a Centros de Transformacion: %s\n', sum{j in J, k in K} c3[j,k]*x3[j,k];
+printf 'Costo transporte Centros de Clasificacion aip Centros de Transformacion: %s\n', sum{j in J, k in K} cjkm[j,k]*xjkm[j,k];
 printf '\n';
 	printf 'Centro_Clasificacion Centro_Transformacion Cantidad\n';
 for {j in J} {
 	for {k in K} {
-		printf ' %6s%15s%22s\n',j,k, x3[j,k];
+		printf ' %6s%15s%22s\n',j,k, xjkm[j,k];
 	}
 }
 
@@ -127,12 +147,12 @@ printf '\n';
 printf '';
 printf '\n';
 
-printf 'Costo Centro de Clasificacion  a Recycling: %s\n', sum{j in J, r in R} c5[j,r]*x5[j,r];
+printf 'Costo Centro de Clasificacion  aip Recycling: %s\n', sum{j in J, r in R} cjRm[j,r]*xjRm[j,r];
 printf '\n';
 	printf 'Centro_Clasificacion Recycling Cantidad\n';
 for {j in J} {
 	for {r in R} {
-		printf ' %6s%15s%22s\n',j,r, x5[j,r];
+		printf ' %6s%15s%22s\n',j,r, xjRm[j,r];
 	}
 }
 
@@ -140,12 +160,12 @@ printf '\n';
 printf '......................................................................';
 printf '\n';
 
-printf 'Costo Centro de Transnformacion  a Manufactura: %s\n', sum{k in K, m in M} c6[k,m]*x6[k,m];
+printf 'Costo Centro de Transnformacion  aip Manufactura: %s\n', sum{k in K, m in M} ckFm[k,m]*xkFm[k,m];
 printf '\n';
 	printf 'Centro_Transformacion Manufactura Cantidad\n';
 for {k in K} {
 	for {m in M} {
-		printf ' %6s%15s%22s\n',k,m, x6[k,m];
+		printf ' %6s%15s%22s\n',k,m, xkFm[k,m];
 	}
 }
 
@@ -153,12 +173,12 @@ printf '\n';
 printf '......................................................................';
 printf '\n';
 
-printf 'Costo Centro de transformacion  a Recycling: %s\n', sum{k in K, r in R} c7[k,r]*x7[k,r];
+printf 'Costo Centro de transformacion  aip Recycling: %s\n', sum{k in K, r in R} ckRm[k,r]*xkRm[k,r];
 printf '\n';
 	printf 'Centro_Transformacion Recycling Cantidad\n';
 for {k in K} {
 	for {r in R} {
-		printf ' %6s%15s%22s\n',k,r, x7[k,r];
+		printf ' %6s%15s%22s\n',k,r, xkRm[k,r];
 	}
 }
 
@@ -167,12 +187,12 @@ printf '\n';
 printf '';
 printf '\n';
 
-printf 'Costo Centro de transformacion  a Disposal: %s\n', sum{k in K, d in D} c8[k,d]*x8[k,d];
+printf 'Costo Centro de transformacion  aip Disposal: %s\n', sum{k in K, d in D} ckDm[k,d]*xkDm[k,d];
 printf '\n';
 	printf 'Centro_Transformacion Disposal Cantidad\n';
 for {k in K} {
 	for {d in D} {
-		printf ' %6s%15s%22s\n',k,d, x8[k,d];
+		printf ' %6s%15s%22s\n',k,d, xkDm[k,d];
 	}
 }
 
@@ -180,12 +200,12 @@ printf '\n';
 printf '......................................................................';
 printf '\n';
 
-printf 'Costo Supplier  a Manufactura: %s\n', sum{s in S, m in M} c11[s,m]*y[s,m];
+printf 'Costo Supplier  aip Manufactura: %s\n', sum{s in S, m in M} cSFm[s,m]*ySFm[s,m];
 printf '\n';
 	printf 'Supplier Manufactura Cantidad\n';
 for {s in S} {
 	for { m in M} {
-		printf ' %6s%15s%22s\n',s,m, y[s,m];
+		printf ' %6s%15s%22s\n',s,m, ySFm[s,m];
 	}
 }
 
@@ -198,7 +218,7 @@ printf 'Apertura de los centros de clasificacion: %s\n';
 printf '\n';
 	printf 'Centro_Clasificacion Estado\n';
 	for {j in J} {
-		printf ' %10s%15s%20s\n',j,z[j];
+		printf ' %10s%15s%20s\n',j,zjp[j];
 		printf '\n';
 	}
 
@@ -211,101 +231,116 @@ printf 'Apertura de los centros de transformacion: %s\n';
 printf '\n';
 	printf 'Centro_Transformacion Estado\n';
 	for {k in K} {
-		printf ' %10s%15s%20s\n',k,w[k];printf '\n';
+		printf ' %10s%15s%20s\n',k,wkm[k];printf '\n';
 	}
 
 printf '\n';
 printf '';
-#end;
+
+###########################################
+###########################################
 
 data;
-set I:=  i1 i2 i3 i4 i5;
-set J:=  j1 j2 j3;
-set K:= k1 k2 k3 k4 k5;
-set M:= m1;
-set R:= r1;
-set S:= s1;
-set D:= d1;
 
-param a:=
-i1 18
-i2 60
-i3 50
-i4  40
-i5  50;
-param b:=
-j1 80
-j2 150
-j3 100;
-param u:=
-k1 100
-k2 180
-k3 50
-k4 15
-k5 10;
+set I:=  'Piura', 'Trujillo', 'Chimbote', 'Lima', 'Arequipa';
+set J:=  'D_Trujillo', 'D_Lima', 'D_Arequipa';
+set K:= 'P_Lima', 'P_Bogota', 'P_Santiago', 'P_SaoPaulo', 'P_BuenosAires';
 
+set M:= 'Refur_Santiago';
 
-param dM:=
-m1 100;
-param uR:=
-r1 100;
+set R:= 'Recy_BuenosAires';
+set S:= 'Sup_SaoPaulo';
+set D:= 'Dispo_Bogota';
 
-param uD:=
-d1 100;
+param nj:= 3; #number of elementes in J
+param nk:= 2; #number of elements in K
 
+param 				:		aip:=
+		'Piura'				18
+		'Trujillo'		60
+		'Chimbote'		50
+		'Lima'				40
+		'Arequipa'		50;
 
-param c1: j1 j2 j3:=
-i1 0 18 0
-i2  10 0 12
-i3 0 13 0
-i4 16 0 14
-i5 0 20 0;
-param c2: k1 k2 k3 k4 k5:=
-i1 150 0 0 0 0
-i2 140 0 0 0 0
-i3 250 0 0 0 0
-i4 250 0 0 0 0
-i5 250 0 0 0 0;
-param c3: k1 k2 k3 k4 k5:=
-j1 26 0 0 30 0
-j2 43 0 24 0 0
-j3 15 0 0 23 0;
+param 				:		bjm:=
+		'D_Trujillo'  80
+		'D_Lima'  		150
+		'D_Arequipa'  100;
 
-param c5: r1:=
-j1 110
-j2 85
-j3 70;
+param 				:			ukm:=
+		'P_Lima' 				100
+		'P_Bogota' 			180
+		'P_Santiago' 		50
+		'P_SaoPaulo' 		15
+		'P_BuenosAires'	10;
 
-param c6: m1:=
-k1 0
-k2 10
-k3 0
-k4 10
-k5 0;
-param c7: r1:=
-k1 0
-k2 11
-k3 0
-k4 12
-k5 0;
-param c8: d1:=
-k1 0
-k2 10
-k3 0
-k4 10
-k5 0;
+param 					: dm:=
+'Refur_Santiago' 	100;
 
-param c9:=
-j1 12
-j2 10
-j3 9;
-param c10:=
-k1 10
-k2 11
-k3 10
-k4 12
-k5 10;
+param 			:			 ur:=
+'Recy_BuenosAires' 100;
 
-param c11: m1 :=
-s1 12;
+param 			:			ud:=
+'Dispo_Bogota' 		100;
+
+param	 cijp	: 'D_Trujillo' 'D_Lima' 'D_Arequipa':=
+		'Piura'			0						18				0
+		'Trujillo'  10					0					12
+		'Chimbote' 	0						13				0
+		'Lima'			16					0					14
+		'Arequipa' 	0						20				0;
+
+param cikp: 'P_Lima' 'P_Bogota' 'P_Santiago' 'P_SaoPaulo' 'P_BuenosAires':=
+'Piura' 150 0 0 0 0
+'Trujillo' 140 0 0 0 0
+'Chimbote' 250 0 0 0 0
+'Lima' 250 0 0 0 0
+'Arequipa' 250 0 0 0 0;
+
+param cjkm: 'P_Lima' 'P_Bogota' 'P_Santiago' 'P_SaoPaulo' 'P_BuenosAires':=
+'D_Trujillo' 26 0 0 30 0
+'D_Lima' 43 0 24 0 0
+'D_Arequipa' 15 0 0 23 0;
+
+param cjRm: 'Recy_BuenosAires':=
+'D_Trujillo' 110
+'D_Lima' 85
+'D_Arequipa' 70;
+
+param ckFm: 'Refur_Santiago':=
+'P_Lima' 0
+'P_Bogota' 10
+'P_Santiago' 0
+'P_SaoPaulo' 10
+'P_BuenosAires' 0;
+
+param ckRm: 'Recy_BuenosAires':=
+'P_Lima' 0
+'P_Bogota' 11
+'P_Santiago' 0
+'P_SaoPaulo' 12
+'P_BuenosAires' 0;
+
+param ckDm: 'Dispo_Bogota':=
+'P_Lima' 0
+'P_Bogota' 10
+'P_Santiago' 0
+'P_SaoPaulo' 10
+'P_BuenosAires' 0;
+
+param codjp:=
+'D_Trujillo' 12
+'D_Lima' 10
+'D_Arequipa' 9;
+
+param copkm:=
+'P_Lima' 10
+'P_Bogota' 11
+'P_Santiago' 10
+'P_SaoPaulo' 12
+'P_BuenosAires' 10;
+
+param cSFm: 'Refur_Santiago' :=
+'Sup_SaoPaulo' 12;
+
 end;
