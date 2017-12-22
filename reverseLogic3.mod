@@ -76,26 +76,28 @@ minimize Z :
 
 
 
-s.t. R1{i in I}: sum{j in J} xijp[i,j] + sum{k in K} xikp[i,k] >= aip[i]; #
+s.t. R1{i in I}: sum{j in J} xijp[i,j] + sum{k in K} xikp[i,k] <= aip[i]; #Control de flujo capa I - J
 
-s.t. R2{j in J}: sum{k in K} xjkm[j,k] + sum{r in R} xjRm[j,r] <= bjm[j]*zjp[j];
+s.t. R2{j in J}: sum{k in K} xjkm[j,k] + sum{r in R} xjRm[j,r] <= bjm[j]*zjp[j]; #Control de Flujo cap J - K
 
-s.t. R3{k in K}: sum{m in M}xkFm[k,m] + sum{r in R}xkRm[k,r] + sum{d in D}xkDm[k,d] <= ukm[k]*wkm[k]; #only for one product with one piece
-
-s.t. R4{j in J}: sum{i in I}xijp[i,j] = sum{k in K}xjkm[j,k] + sum{r in R}xjRm[j,r] ;
-
-s.t. R5{k in K}: sum{i in I}xikp[i,k] + sum{j in J}xjkm[j,k] = sum{m in M}xkFm[k,m] + sum{r in R}xkRm[k,r] + sum{d in D}xkDm[k,d] ;
-
+s.t. R3{k in K}: sum{m in M}xkFm[k,m] + sum{r in R}xkRm[k,r] + sum{d in D}xkDm[k,d] <= ukm[k]*wkm[k];
+#Solo para un producto conformado por una pieza, omitiendo el error al declarar el dominio en el modelo matematico
+s.t. R4{j in J}: sum{k in K}xjkm[j,k] + sum{r in R}xjRm[j,r] = sum{i in I}xijp[i,j]; #Control de flujo , capa I - J - K - R , evitando
+#se envie a la capa R desde K sin pedir a I desde J
+s.t. R5{k in K}: sum{m in M}xkFm[k,m] + sum{r in R}xkRm[k,r] + sum{d in D}xkDm[k,d] = sum{i in I}xikp[i,k] + sum{j in J}xjkm[j,k];
+#Control de flujo, restriccion para no enviar Remanufactura, Reciclaje o Dispensar mas de lo que se acopio
 s.t. R6{j in J}: zjp[j]<= nj;
-
+#Centros de Desensamblaje usados menor o igual que los disponibles
 s.t. R7{k in K}: wkm[k]<= nk ;
-
+#Cetros de Procesamiento usados menor o igual que los disponibles
 s.t. R8{r in R}: sum{j in J}xjRm[j,r] + sum{k in K}xkRm[k,r] <= ur[r];
-
+#Control de flujo que evita se supere el limite de los centros Reciclaje
 s.t. R9{d in D}: sum{k in K}xkDm[k,d] <= ud[d];
-
+#Control de flujo que evita se supere el limite de los centros de Dispensacion"
 s.t. R10{m in M}: sum{s in S}ySFm[s,m] + sum{k in K}xkFm[k,m] >= dm[m];
-
+#Control de flujo que evita no pueda superar el limite de demanda"
+s.t. R11{s in S}: sum{m in M}ySFm[s,m] <= us[s];
+#Control de flujo que evita se supere el limite de los centros de suministros"
 solve;
 
 ###########################################
@@ -109,9 +111,11 @@ printf '\n\n';
 printf 'Costo Total Centros de Retorno - Centros de Desensamblaje:\t %s\n', sum{i in I, j in J}cijp[i,j]*xijp[i,j];
 printf '\n\n#-#-#-# \n\n';
 
-for {i in I} {
+for {i in I}
+{
 	printf "\nCentro de Retorno :\t %s", i;
-	for {j in J} {
+	for {j in J}
+	{
 		printf "\n\tCentro de Desensamblaje :\t %s", j;
 		printf "\n\t\tCantidad Transportada :\t %s", xijp[i,j];
 	}
@@ -121,128 +125,157 @@ printf "\n\n*~*~*~*\n\n";
 printf '\n\n';
 
 printf '\n\n';
-printf 'Costo Total Centros de Retorno - Centros de Procesamiento:\t %s\n', sum{i in I, k in K}cikp[i,k]*xikp[i,k];
+printf 'Costo Total Centros de Desensamblaje - Centros de Procesamiento:\t %s\n', sum{i in I, k in K}cikp[i,k]*xikp[i,k];
 printf '\n\n#-#-#-# \n\n';
 
-for {i in I} {
+for {i in I}
+{
 	printf "\nCentro de Retorno :\t %s", i;
-	for {k in K} {
+	for {k in K}
+	{
 		printf "\n\tCentro de Procesamiento :\t %s", k;
 		printf "\n\t\tCantidad Transportada :\t %s", xikp[i,k];
 	}
 }
 
 
+printf "\n\n*~*~*~*\n\n";
+printf '\n\n';
 
-printf '\n';
-printf '.....................................................................';
-printf '\n';
+printf '\n\n';
+printf 'Costo Total Centros de Desensamblaje - Centros de Procesamiento:\t %s\n', sum{j in J, k in K}cjkm[j,k]*xjkm[j,k];
+printf '\n\n#-#-#-# \n\n';
 
-printf 'Costo transporte Centros de Clasificacion aip Centros de Transformacion: %s\n', sum{j in J, k in K} cjkm[j,k]*xjkm[j,k];
-printf '\n';
-	printf 'Centro_Clasificacion Centro_Transformacion Cantidad\n';
-for {j in J} {
-	for {k in K} {
-		printf ' %6s%15s%22s\n',j,k, xjkm[j,k];
-	}
-}
-
-printf '\n';
-printf '......................................................................';
-printf '\n';
-printf '\n';
-printf '';
-printf '\n';
-
-printf 'Costo Centro de Clasificacion  aip Recycling: %s\n', sum{j in J, r in R} cjRm[j,r]*xjRm[j,r];
-printf '\n';
-	printf 'Centro_Clasificacion Recycling Cantidad\n';
-for {j in J} {
-	for {r in R} {
-		printf ' %6s%15s%22s\n',j,r, xjRm[j,r];
-	}
-}
-
-printf '\n';
-printf '......................................................................';
-printf '\n';
-
-printf 'Costo Centro de Transnformacion  aip Manufactura: %s\n', sum{k in K, m in M} ckFm[k,m]*xkFm[k,m];
-printf '\n';
-	printf 'Centro_Transformacion Manufactura Cantidad\n';
-for {k in K} {
-	for {m in M} {
-		printf ' %6s%15s%22s\n',k,m, xkFm[k,m];
-	}
-}
-
-printf '\n';
-printf '......................................................................';
-printf '\n';
-
-printf 'Costo Centro de transformacion  aip Recycling: %s\n', sum{k in K, r in R} ckRm[k,r]*xkRm[k,r];
-printf '\n';
-	printf 'Centro_Transformacion Recycling Cantidad\n';
-for {k in K} {
-	for {r in R} {
-		printf ' %6s%15s%22s\n',k,r, xkRm[k,r];
+for {j in J}
+{
+	printf "\nCentro de Desensamblaje :\t %s", j;
+	for {k in K}
+	{
+		printf "\n\tCentro de Procesamiento :\t %s", k;
+		printf "\n\t\tCantidad Transportada :\t %s", xjkm[j,k];
 	}
 }
 
 
-printf '\n';
-printf '';
-printf '\n';
+printf "\n\n*~*~*~*\n\n";
+printf '\n\n';
 
-printf 'Costo Centro de transformacion  aip Disposal: %s\n', sum{k in K, d in D} ckDm[k,d]*xkDm[k,d];
-printf '\n';
-	printf 'Centro_Transformacion Disposal Cantidad\n';
-for {k in K} {
-	for {d in D} {
-		printf ' %6s%15s%22s\n',k,d, xkDm[k,d];
+printf '\n\n';
+printf 'Costo Total Centros de Desensamblaje - Centros de Reciclaje:\t %s\n', sum{j in J, r in R} cjRm[j,r]*xjRm[j,r];
+printf '\n\n#-#-#-# \n\n';
+
+for {j in J}
+{
+	printf "\nCentro de Desensamblaje :\t %s", j;
+	for {r in R}
+	{
+		printf "\n\tCentro de Reciclaje :\t %s", r;
+		printf "\n\t\tCantidad Transportada :\t %s", xjRm[j,r];
 	}
 }
 
-printf '\n';
-printf '......................................................................';
-printf '\n';
 
-printf 'Costo Supplier  aip Manufactura: %s\n', sum{s in S, m in M} cSFm[s,m]*ySFm[s,m];
-printf '\n';
-	printf 'Supplier Manufactura Cantidad\n';
-for {s in S} {
-	for { m in M} {
-		printf ' %6s%15s%22s\n',s,m, ySFm[s,m];
+printf "\n\n*~*~*~*\n\n";
+printf '\n\n';
+
+printf '\n\n';
+printf 'Costo Total Centros de Procesamiento - Centros de Remanufactura:\t %s\n', sum{k in K, m in M} ckFm[k,m]*xkFm[k,m];
+printf '\n\n#-#-#-# \n\n';
+
+for {k in K}
+{
+	printf "\nCentro de Procesamiento :\t %s", k;
+	for {m in M}
+	{
+		printf "\n\tCentro de Remanufactura :\t %s", m;
+		printf "\n\t\tCantidad Transportada :\t %s", xkFm[k,m];
 	}
 }
 
-printf '\n';
-printf '';
-printf '\n';
+printf "\n\n*~*~*~*\n\n";
+printf '\n\n';
 
+printf '\n\n';
+printf 'Costo Total Centros de Procesamiento - Centros de Reciclaje:\t %s\n', sum{k in K, r in R} ckRm[k,r]*xkRm[k,r];
+printf '\n\n#-#-#-# \n\n';
 
-printf 'Apertura de los centros de clasificacion: %s\n';
-printf '\n';
-	printf 'Centro_Clasificacion Estado\n';
-	for {j in J} {
-		printf ' %10s%15s%20s\n',j,zjp[j];
-		printf '\n';
+for {k in K}
+{
+	printf "\nCentro de Procesamiento :\t %s", k;
+	for {r in R}
+	{
+		printf "\n\tCentro de Reciclaje :\t %s", r;
+		printf "\n\t\tCantidad Transportada :\t %s", xkRm[k,r];
 	}
+}
 
-printf '\n';
-printf '';
-printf '\n';
+printf "\n\n*~*~*~*\n\n";
+printf '\n\n';
 
+printf '\n\n';
+printf 'Costo Total Centros de Procesamiento - Centros de Dispensacion:\t %s\n', sum{k in K, d in D} ckDm[k,d]*xkDm[k,d];
+printf '\n\n#-#-#-# \n\n';
 
-printf 'Apertura de los centros de transformacion: %s\n';
-printf '\n';
-	printf 'Centro_Transformacion Estado\n';
-	for {k in K} {
-		printf ' %10s%15s%20s\n',k,wkm[k];printf '\n';
+for {k in K}
+{
+	printf "\nCentro de Procesamiento :\t %s", k;
+	for {d in D}
+	{
+		printf "\n\tCentro de Dispensacion :\t %s", d;
+		printf "\n\t\tCantidad Transportada :\t %s", xkDm[k,d];
 	}
+}
 
-printf '\n';
-printf '';
+
+printf "\n\n*~*~*~*\n\n";
+printf '\n\n';
+
+printf '\n\n';
+printf 'Costo Total Centros de Suministros - Centros de Remanufactura:\t %s\n', sum{s in S, m in M} cSFm[s,m]*ySFm[s,m];
+printf '\n\n#-#-#-# \n\n';
+
+for {s in S}
+{
+	printf "\nCentro de Suministros :\t %s", s;
+	for {m in M}
+	{
+		printf "\n\tCentro de Remanufactura :\t %s", m;
+		printf "\n\t\tCantidad Transportada :\t %s", ySFm[s,m];
+	}
+}
+
+printf "\n\n*~*~*~*\n\n";
+printf '\n\n';
+
+printf '\n\n';
+printf "Centros de Desensamblaje Usados";
+printf '\n\n#-#-#-# \n\n';
+
+for {j in J}
+{
+	printf "\nCentro de Desensamblaje :\t %s", j;
+	printf "\n\tEstado \t %s", zjp[j];
+}
+
+printf "\n\n*~*~*~*\n\n";
+printf '\n\n';
+
+printf '\n\n';
+printf "Centros de Procesamiento Usados";
+printf '\n\n#-#-#-# \n\n';
+
+for {k in K}
+{
+	printf "\nCentro de Procesamiento :\t %s", k;
+	printf "\n\tEstado \t %s", wkm[k];
+}
+
+printf "\n\n\n";
+
+printf "COSTO TOTAL MINIMIZADO\t %s", Z;
+
+printf "\n\n\n";
+
 
 ###########################################
 ###########################################

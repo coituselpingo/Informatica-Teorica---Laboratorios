@@ -12,32 +12,35 @@ param nj:= 3; #number of elementes in J
 param nk:= 2; #number of elements in K
 
 param 				:		aip:=
-		'Piura'				200
-		'Trujillo'		800
-		'Chimbote'		250
-		'Lima'				1200
-		'Arequipa'		600;
+		'Piura'				20
+		'Trujillo'		80
+		'Chimbote'		25
+		'Lima'				120
+		'Arequipa'		60;
 
 param 				:		bjm:=
-		'D_Trujillo'  1500
-		'D_Lima'  		2000
-		'D_Arequipa'  1500;
+		'D_Trujillo'  150
+		'D_Lima'  		200
+		'D_Arequipa'  150;
 
 param 				:			ukm:=
-		'P_Lima' 				2000
-		'P_Bogota' 			1800
-		'P_Santiago' 		3000
-		'P_SaoPaulo' 		3400
-		'P_BuenosAires'	2600;
+		'P_Lima' 				200
+		'P_Bogota' 			180
+		'P_Santiago' 		300
+		'P_SaoPaulo' 		340
+		'P_BuenosAires'	260;
 
 param 				:				dm:=
-		'Refur_Santiago' 	3700;
+		'Refur_Santiago' 	120;
 
 param 				:			 		ur:=
-		'Recy_BuenosAires'	4200;
+		'Recy_BuenosAires'	60;
 
 param 				:				ud:=
-		'Dispo_Bogota' 		8000;
+		'Dispo_Bogota' 		500;
+
+param 				:				us:=
+		'Sup_SaoPaulo' 		800;
 
 param	 cijp	: 'D_Trujillo' 'D_Lima' 'D_Arequipa':=
 		'Piura'			20					40				80
